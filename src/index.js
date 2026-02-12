@@ -1,5 +1,5 @@
-// src/index.js
 const http = require("http");
+const { validateProduct } = require("./lib/validate");
 const {
   listProducts,
   findById,
@@ -24,13 +24,13 @@ const server = http.createServer((req, res) => {
     return res.end(JSON.stringify(listProducts()));
   }
 
-  // Get Single Product /products/:id
+  // Get Single Product
   if (url.startsWith("/products/") && method === "GET") {
     const id = url.split("/")[2];
     const product = findById(id);
     if (!product) {
       res.statusCode = 404;
-      return res.end(JSON.stringify({ error: "Product is not found" }));
+      return res.end(JSON.stringify({ error: "Product not found" }));
     }
     res.statusCode = 200;
     return res.end(JSON.stringify(product));
@@ -43,18 +43,17 @@ const server = http.createServer((req, res) => {
     req.on("end", () => {
       try {
         const data = JSON.parse(body);
-        if (!data.name || data.price === undefined || data.price < 0) {
+        // استفاده از فایل ولیدیشن
+        if (!validateProduct(data)) {
           res.statusCode = 400;
-          return res.end(
-            JSON.stringify({ error: "product name is not found " }),
-          );
+          return res.end(JSON.stringify({ error: "Invalid product data" }));
         }
         const newProduct = createProduct(data);
         res.statusCode = 201;
         res.end(JSON.stringify(newProduct));
       } catch (e) {
         res.statusCode = 400;
-        res.end(JSON.stringify({ error: "the product is created" }));
+        res.end(JSON.stringify({ error: "Invalid JSON format" }));
       }
     });
     return;
@@ -66,13 +65,18 @@ const server = http.createServer((req, res) => {
     let body = "";
     req.on("data", (chunk) => (body += chunk.toString()));
     req.on("end", () => {
-      const updated = updateProduct(id, JSON.parse(body));
-      if (!updated) {
-        res.statusCode = 404;
-        return res.end(JSON.stringify({ error: "pruduct is puted " }));
+      try {
+        const updated = updateProduct(id, JSON.parse(body));
+        if (!updated) {
+          res.statusCode = 404;
+          return res.end(JSON.stringify({ error: "Product not found" }));
+        }
+        res.statusCode = 200;
+        res.end(JSON.stringify(updated));
+      } catch (e) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({ error: "Invalid JSON" }));
       }
-      res.statusCode = 200;
-      res.end(JSON.stringify(updated));
     });
     return;
   }
@@ -85,7 +89,7 @@ const server = http.createServer((req, res) => {
       return res.end();
     }
     res.statusCode = 404;
-    return res.end(JSON.stringify({ error: "product Deleted successfully " }));
+    return res.end(JSON.stringify({ error: "Product not found" }));
   }
 });
 
