@@ -1,0 +1,27 @@
+for start the server 
+node src/index.js
+
+1 (Health Check)
+powershell
+curl.exe -X GET http://localhost:3000/health
+
+
+2. (List Products)
+powershell
+curl.exe -X GET http://localhost:3000/products
+
+3 . (Create Product by ID)
+curl.exe -X POST http://localhost:3000/products -H "Content-Type: application/json" -d "{\"id\": \"500\", \"name\": \"Laptop\", \"price\": 1200}"
+
+4. (Get by ID)
+curl.exe -X GET http://localhost:3000/products/500
+
+5 . (Update Product)
+curl.exe -X PUT http://localhost:3000/products/500 -H "Content-Type: application/json" -d "{\"price\": 1300}"
+
+6 .(Delete Product)
+curl.exe -X DELETE http://localhost:3000/products/500
+
+*7(Verify Delete)
+powershell
+curl.exe -X GET http://localhost:3000/products
