@@ -1,0 +1,28 @@
+### Get All Products List
+GET http://localhost:3000/products
+
+### Validation Test (Empty Name - Should return 400 Bad Request)
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name": "",
+  "price": 100
+}
+
+### Validation Test (Negative Price - Should return 400 Bad Request)
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name": "Test Product",
+  "price": -50
+}
+### Success Test (Valid Data - Should return 201 Created)
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name": "Valid Product",
+  "price": 250
+}
